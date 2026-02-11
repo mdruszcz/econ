@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Planning Corner – HTML Econometric Simulator</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6fa; color: #1f2937; }
+    header { background: #3f3f8f; color: #fff; padding: 14px 20px; }
+    h1 { margin: 0; font-size: 20px; }
+    .sub { margin-top: 6px; font-size: 13px; opacity: .95; }
+    main { max-width: 1150px; margin: 18px auto; padding: 0 16px 24px; }
+    .card { background: #fff; border: 1px solid #d8dee9; border-radius: 10px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+    .tabs { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .tab { border: 1px solid #bec8d8; border-radius: 8px; background: #eef2f8; padding: 8px 12px; cursor: pointer; font-weight: 700; }
+    .tab.active { background: #3f3f8f; color: #fff; border-color: #3f3f8f; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 7px 6px; text-align: left; font-size: 13px; }
+    th { background: #f8fafc; position: sticky; top: 0; }
+    input[type="number"] { width: 110px; padding: 5px; }
+    input[type="text"] { padding: 6px; width: 280px; }
+    .btn { border: 1px solid #7c89a1; background: #eef2f8; border-radius: 8px; padding: 7px 11px; cursor: pointer; font-weight: 700; }
+    .btn.primary { background: #3f3f8f; color: #fff; border-color: #3f3f8f; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .grow { flex: 1; min-width: 280px; }
+    .graphs { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 10px; }
+    .graph { border: 1px solid #dbe3ef; border-radius: 8px; padding: 8px; }
+    canvas { width: 100%; height: 170px; }
+    .small { font-size: 12px; color: #4b5563; }
+    .pill { background: #eef2ff; color: #3730a3; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+    details { margin-top: 8px; }
+    .right { text-align: right; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Planning Corner – HTML MVP</h1>
+  <div class="sub">3-step scenario workflow (hypotheses → simulation → results/export), runnable as a single static HTML file.</div>
+</header>
+<main>
+  <section class="card">
+    <div class="tabs">
+      <button class="tab active" data-tab="step1">STEP 1 · Hypotheses</button>
+      <button class="tab" data-tab="step2">STEP 2 · Simulation</button>
+      <button class="tab" data-tab="step3">STEP 3 · Results</button>
+    </div>
+
+    <div id="step1" class="panel active">
+      <div class="row">
+        <div class="grow">
+          <h3>Policy instruments</h3>
+          <p class="small">Instrument names mirror <code>pc.parms</code> (<code>HypoVar</code>). Values are yearly shocks applied on 2013–2020.</p>
+          <table>
+            <thead><tr><th>Variable</th><th>Description</th><th>Min</th><th>Max</th><th>Value</th></tr></thead>
+            <tbody id="instrumentRows"></tbody>
+          </table>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn" id="presetNeutral">Reset baseline</button>
+            <button class="btn" id="preset1bn">Preset: €1bn ex-ante style</button>
+            <button class="btn primary" id="runSimulation">Start simulation</button>
+          </div>
+        </div>
+        <div class="grow">
+          <h3>Baseline path (reference)</h3>
+          <p class="small">Used as comparison path. Replace in-code with extracted series from <code>ML2u.var</code> when available in web format.</p>
+          <table>
+            <thead><tr><th>Year</th><th>GDP gr. %</th><th>Inflation %</th><th>Deficit % GDP</th><th>Unemployment %</th></tr></thead>
+            <tbody id="baselineTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="step2" class="panel">
+      <h3>Simulation progress <span class="pill" id="progress">Not started</span></h3>
+      <p class="small">Charts correspond to configured outputs: GDP growth <code>grt(GDP_)</code>, inflation <code>grt(PC_)</code>, deficit ratio <code>DR_*100</code>, unemployment <code>UR_*100</code>.</p>
+      <div class="graphs">
+        <div class="graph"><strong>GDP growth (%)</strong><canvas id="gdpCanvas" width="300" height="170"></canvas></div>
+        <div class="graph"><strong>Inflation (%)</strong><canvas id="infCanvas" width="300" height="170"></canvas></div>
+        <div class="graph"><strong>Deficit (% GDP)</strong><canvas id="defCanvas" width="300" height="170"></canvas></div>
+        <div class="graph"><strong>Unemployment (%)</strong><canvas id="unCanvas" width="300" height="170"></canvas></div>
+      </div>
+      <div style="margin-top:10px;" class="small" id="simNotes"></div>
+    </div>
+
+    <div id="step3" class="panel">
+      <h3>Results & export</h3>
+      <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+        <button class="btn" data-view="policy">Policy</button>
+        <button class="btn" data-view="impact">Impact vs baseline</button>
+        <button class="btn" data-view="levels">Projection</button>
+        <button class="btn" id="downloadCsv">Export CSV</button>
+      </div>
+      <div id="resultContainer"></div>
+      <details>
+        <summary>Modeling note</summary>
+        <p class="small">This browser MVP reproduces the legacy UX flow and indicator wiring. Because native IODE files (<code>.var/.eqs/.scl</code>) are binary, the equations below are calibrated reduced-form approximations intended for client-side demo. For production fidelity, expose ML2 through a backend (Python + IODE) and return exact trajectories to this page.</p>
+      </details>
+    </div>
+  </section>
+</main>
+<script>
+const YEARS = [2013,2014,2015,2016,2017,2018,2019,2020];
+const baseline = {
+  gdpGrowth:[0.3,1.2,1.7,1.4,1.7,1.8,1.6,1.4],
+  inflation:[1.2,0.6,1.1,1.7,2.1,1.9,1.7,1.6],
+  deficit:[-2.7,-2.6,-2.4,-2.3,-2.1,-1.9,-1.8,-1.7],
+  unemployment:[8.5,8.4,8.3,8.1,7.9,7.7,7.6,7.5]
+};
+
+const instruments = [
+  {key:'VIG_X', label:'Change in public investments (mln)', min:-2000, max:6000, val:0},
+  {key:'ITPC0R_X', label:'VAT rate on consumption (%)', min:15, max:27, val:21},
+  {key:'DTH_X', label:'Change in personal income tax receipts (mln)', min:-10000, max:10000, val:0},
+  {key:'CSSFR_X', label:'Employers social contribution rate (% wages)', min:25, max:40, val:30},
+  {key:'CSSHR_X', label:'Employees social contribution rate (% wages)', min:10, max:20, val:13},
+  {key:'TGH_X', label:'Transfers to households (grt, const prices)', min:-5, max:5, val:0},
+  {key:'WR_X', label:'Correction of private wage growth (%)', min:-2, max:2, val:0},
+  {key:'WGRR_X', label:'Public real wage growth (%)', min:-2, max:5, val:0},
+  {key:'NG_X', label:'Change in public employment (thousands)', min:-40, max:40, val:0},
+  {key:'ZX_X', label:'Change in automatic indexation (%)', min:-2, max:0, val:0}
+];
+
+let simulated = null;
+let resultView = 'impact';
+
+function drawBaselineTable(){
+  const body = document.getElementById('baselineTable');
+  body.innerHTML = YEARS.map((y,i)=>`<tr><td>${y}</td><td>${fmt(baseline.gdpGrowth[i])}</td><td>${fmt(baseline.inflation[i])}</td><td>${fmt(baseline.deficit[i])}</td><td>${fmt(baseline.unemployment[i])}</td></tr>`).join('');
+}
+function drawInstruments(){
+  const rows = document.getElementById('instrumentRows');
+  rows.innerHTML = instruments.map((ins,idx)=>`<tr><td><code>${ins.key}</code></td><td>${ins.label}</td><td>${ins.min}</td><td>${ins.max}</td><td><input type="number" step="0.1" min="${ins.min}" max="${ins.max}" data-idx="${idx}" value="${ins.val}"></td></tr>`).join('');
+  rows.querySelectorAll('input').forEach(input=>input.addEventListener('input',ev=>{
+    const i = Number(ev.target.dataset.idx);
+    const min = Number(ev.target.min), max = Number(ev.target.max);
+    const v = Math.max(min, Math.min(max, Number(ev.target.value)));
+    instruments[i].val = v;
+    ev.target.value = String(v);
+  }));
+}
+function fmt(v){ return Number(v).toFixed(2); }
+
+function runModel(){
+  const v = Object.fromEntries(instruments.map(x=>[x.key,Number(x.val)]));
+  const dVat = v.ITPC0R_X - 21;
+  const dCssEmp = v.CSSFR_X - 30;
+  const dCssHouse = v.CSSHR_X - 13;
+
+  const gdp = [], inf = [], def = [], un = [];
+  for(let i=0;i<YEARS.length;i++){
+    const persistence = i===0 ? 0 : 0.35 * (gdp[i-1]-baseline.gdpGrowth[i-1]);
+    const gShock =
+      0.00022*v.VIG_X +
+      0.00008*(-v.DTH_X) +
+      0.20*v.TGH_X +
+      0.018*v.NG_X +
+      0.08*v.WGRR_X +
+      0.05*v.WR_X -
+      0.22*dVat -
+      0.12*dCssEmp -
+      0.07*dCssHouse;
+    gdp[i] = baseline.gdpGrowth[i] + gShock + persistence;
+
+    const iShock =
+      0.38*dVat +
+      0.22*v.ZX_X +
+      0.10*v.WR_X +
+      0.08*v.WGRR_X +
+      0.02*Math.max(0,gdp[i]-baseline.gdpGrowth[i]);
+    inf[i] = baseline.inflation[i] + iShock;
+
+    const cyc = (gdp[i]-baseline.gdpGrowth[i]);
+    un[i] = baseline.unemployment[i] - 0.30*cyc - 0.022*v.NG_X + 0.03*dCssEmp;
+
+    const fiscal =
+      -0.060*(v.DTH_X/1000) -
+      0.050*(v.VIG_X/1000) +
+      0.040*dVat +
+      0.030*dCssEmp +
+      0.020*dCssHouse -
+      0.070*v.TGH_X -
+      0.030*v.NG_X/10;
+    def[i] = baseline.deficit[i] + fiscal + 0.06*(baseline.gdpGrowth[i]-gdp[i]);
+  }
+
+  return { years:[...YEARS], gdpGrowth:gdp, inflation:inf, deficit:def, unemployment:un, policy:{...v} };
+}
+
+function drawLineChart(canvasId, baseSeries, simSeries, yLabel){
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  ctx.clearRect(0,0,w,h);
+
+  const all = [...baseSeries, ...(simSeries||baseSeries)];
+  const minV = Math.min(...all), maxV = Math.max(...all);
+  const pad = (maxV-minV)*0.2 + 0.4;
+  const yMin = minV - pad, yMax = maxV + pad;
+  const x = i => 26 + i*(w-44)/(YEARS.length-1);
+  const y = v => h-22 - (v-yMin)*(h-40)/(yMax-yMin || 1);
+
+  ctx.strokeStyle = '#d4dbe8'; ctx.lineWidth = 1;
+  for(let i=0;i<4;i++){
+    const gy = 12 + i*(h-30)/3;
+    ctx.beginPath(); ctx.moveTo(24,gy); ctx.lineTo(w-12,gy); ctx.stroke();
+  }
+
+  function plot(series,color){
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath();
+    series.forEach((v,i)=> i===0 ? ctx.moveTo(x(i),y(v)) : ctx.lineTo(x(i),y(v)));
+    ctx.stroke();
+  }
+  plot(baseSeries,'#64748b');
+  if(simSeries) plot(simSeries,'#4338ca');
+
+  ctx.fillStyle = '#374151'; ctx.font = '11px Arial';
+  ctx.fillText(yLabel, 8, 10);
+  ctx.fillText(String(YEARS[0]), 20, h-6); ctx.fillText(String(YEARS[YEARS.length-1]), w-42, h-6);
+  ctx.fillStyle = '#64748b'; ctx.fillRect(60,6,10,3); ctx.fillStyle = '#111827'; ctx.fillText('Baseline',74,10);
+  if(simSeries){ ctx.fillStyle = '#4338ca'; ctx.fillRect(130,6,10,3); ctx.fillStyle = '#111827'; ctx.fillText('Scenario',144,10); }
+}
+
+function renderCharts(){
+  drawLineChart('gdpCanvas', baseline.gdpGrowth, simulated && simulated.gdpGrowth, '%');
+  drawLineChart('infCanvas', baseline.inflation, simulated && simulated.inflation, '%');
+  drawLineChart('defCanvas', baseline.deficit, simulated && simulated.deficit, '% GDP');
+  drawLineChart('unCanvas', baseline.unemployment, simulated && simulated.unemployment, '%');
+}
+
+function renderResults(){
+  const box = document.getElementById('resultContainer');
+  if(!simulated){ box.innerHTML = '<p class="small">Run STEP 2 to see results.</p>'; return; }
+
+  if(resultView === 'policy'){
+    box.innerHTML = `<table><thead><tr><th>Instrument</th><th>Value</th></tr></thead><tbody>${Object.entries(simulated.policy).map(([k,v])=>`<tr><td><code>${k}</code></td><td>${fmt(v)}</td></tr>`).join('')}</tbody></table>`;
+    return;
+  }
+
+  const rows = YEARS.map((y,i)=>{
+    const values = resultView === 'impact'
+      ? [
+          simulated.gdpGrowth[i]-baseline.gdpGrowth[i],
+          simulated.inflation[i]-baseline.inflation[i],
+          simulated.deficit[i]-baseline.deficit[i],
+          simulated.unemployment[i]-baseline.unemployment[i]
+        ]
+      : [simulated.gdpGrowth[i], simulated.inflation[i], simulated.deficit[i], simulated.unemployment[i]];
+    return `<tr><td>${y}</td>${values.map(v=>`<td class="right">${fmt(v)}</td>`).join('')}</tr>`;
+  }).join('');
+
+  box.innerHTML = `
+    <table>
+      <thead><tr><th>Year</th><th>GDP growth (%)</th><th>Inflation (%)</th><th>Deficit (% GDP)</th><th>Unemployment (%)</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function downloadCSV(){
+  if(!simulated) return;
+  const head = 'year,gdp_growth_base,gdp_growth_scn,inflation_base,inflation_scn,deficit_base,deficit_scn,unemployment_base,unemployment_scn\n';
+  const body = YEARS.map((y,i)=>[y,baseline.gdpGrowth[i],simulated.gdpGrowth[i],baseline.inflation[i],simulated.inflation[i],baseline.deficit[i],simulated.deficit[i],baseline.unemployment[i],simulated.unemployment[i]].join(',')).join('\n');
+  const blob = new Blob([head+body],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ml2_html_simulation_results.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function setActiveTab(id){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===id));
+}
+
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>setActiveTab(btn.dataset.tab)));
+document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>{ resultView = btn.dataset.view; renderResults(); }));
+
+document.getElementById('runSimulation').addEventListener('click', ()=>{
+  simulated = runModel();
+  document.getElementById('progress').textContent = 'Simulation complete';
+  document.getElementById('simNotes').textContent = 'Scenario computed for 2013–2020. Open STEP 3 for policy, impacts, projection, and export.';
+  renderCharts();
+  renderResults();
+  setActiveTab('step2');
+});
+
+document.getElementById('presetNeutral').addEventListener('click', ()=>{
+  instruments.forEach(ins=>{ if(ins.key==='ITPC0R_X') ins.val=21; else if(ins.key==='CSSFR_X') ins.val=30; else if(ins.key==='CSSHR_X') ins.val=13; else ins.val=0; });
+  drawInstruments();
+});
+
+document.getElementById('preset1bn').addEventListener('click', ()=>{
+  instruments.forEach(ins=>{ if(ins.key==='ITPC0R_X') ins.val=21.6; else if(ins.key==='DTH_X') ins.val=650; else if(ins.key==='VIG_X') ins.val=350; else if(ins.key==='TGH_X') ins.val=-0.5; else if(ins.key==='CSSFR_X') ins.val=30.3; else if(ins.key==='CSSHR_X') ins.val=13.15; else if(ins.key==='NG_X') ins.val=3; else ins.val=0; });
+  drawInstruments();
+});
+
+document.getElementById('downloadCsv').addEventListener('click', downloadCSV);
+
+drawBaselineTable();
+drawInstruments();
+renderCharts();
+renderResults();
+</script>
+</body>
+</html>
