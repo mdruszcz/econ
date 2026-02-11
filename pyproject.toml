@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml2-simulator"
+version = "0.1.0"
+description = "ML2 Belgian Economy Macro Simulation Engine"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "fastapi>=0.104",
+    "pydantic>=2.0",
+    "uvicorn[standard]>=0.24",
+    "openpyxl>=3.1",
+    "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.21",
+    "httpx>=0.25",
+    "ruff>=0.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["ml2*", "api*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
