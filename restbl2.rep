@@ -1,0 +1,11 @@
+$define compare %1%
+
+$ViewTblFile 2 %compare%
+$ViewTbl 2013:5[1-2];2020[1-2] INSTRUMENT
+
+$ViewTblFile 2 %compare%
+$ViewTbl 2013:5[1/2];2020[1/2] MACRO_IMPACTS
+$ViewTblFile 2 %compare%
+$ViewTbl 2013:5[1-2];2020[1-2] RATIOS
+$ViewTblFile 2 %compare%
+$ViewTbl 2013:5[1-2];2020[1-2] GACCOUNTR,GACCOUNT,HACCOUNTR,HACCOUNT,FACCOUNTR,FACCOUNT,WACCOUNTR,WACCOUNT

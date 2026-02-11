@@ -1,0 +1,4 @@
+$define compare %1%
+
+$ViewTblFile 2 %compare%
+$ViewTbl 2013:5[1;2];2020[1;2] INSTRUMENT

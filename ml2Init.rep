@@ -1,0 +1,20 @@
+
+# Simulateur du modŠle ML2
+# ------------------------
+
+# A. D‚finition des fichiers input
+# --------------------------------
+
+$define cmtfile ML2.cmt
+$define eqsfile ML2u.eqs
+$define lstfile ML2.lst
+$define sclfile ML2u.scl
+$define tblfile ML2.tbl
+
+# B. Chargement de la Simulation de r‚f‚rence
+# -------------------------------------------
+$wsloadcmt %cmtfile%
+$wsloadeqs %eqsfile%
+$wsloadlst %lstfile%
+$wsloadscl %sclfile%
+$wsloadtbl %tblfile%

@@ -1,0 +1,27 @@
+$Define filename %2%
+
+$-filedeletertf %filename%
+$PrintDest %filename% RTF
+.par1 tit_0
+Policy Instruments
+
+$PrintNbdec 3
+$PrintTblFile 2 %1%
+$PrintTbl 2013:5[1;2];2020[1;2] INSTRUMENT
+
+.par1 tit_0
+Impacts of policy
+
+$PrintNbdec 2
+$PrintTblFile 2 %1%
+$PrintTbl 2013:5[1/2];2020[1/2] MACRO_IMPACTS
+
+$PrintTblFile 2 %1%
+$PrintTbl 2013:5[1-2];2020[1-2] RATIOS,GACCOUNT,GACCOUNTR,HACCOUNTR,FACCOUNTR,WACCOUNTR
+
+.par1 tit_0
+Macroeconomic projection results
+
+$PrintTblFile 2 %1%
+$PrintTbl 2013:5;2020 MACRO_RESULTS,RATIOS,GACCOUNT,GACCOUNTR,HACCOUNTR,FACCOUNTR,WACCOUNTR
+$msg %filename%  done

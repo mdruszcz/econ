@@ -1,0 +1,84 @@
+# IODE Planning Corner configuration file \
+# Note : lines beginning with '#' or ';' -> comments
+
+# Section 0 : Text on "first step" page + Step Captions & Descriptions
+# --------------------------------------------------------------------
+Introduction|Intro.html
+StepCaption|0|Model presentation
+StepDescription|0|Welcome to the <b>IODE</b> &copy; Planning Corner !
+StepCaption|1|STEP 1 : Create a scenario
+StepDescription|1|In this step, you can <b>modify some exogenenous variables</b> of the model and/or <b>load a previously saved Variable file</b>.\
+<br>Once done, goto STEP 2 to simulate the model. 
+StepCaption|2|STEP 2 : Simulate the scenario
+StepDescription|2|In this step, you <b>simulate</b> the model and display the evolution of some results. \
+<br>Once done, goto STEP 3 to examine the results.
+StepCaption|3|STEP 3 : Show the results
+StepDescription|3|In this step, you can <b>examine, save and export</b> the results \
+<br>Once done, goto STEP 1 to start over again.
+
+# Section 1 : initialisation report and reference vars file (baseline)
+# ------------------------------------------------------------
+InitReport|ml2Init.rep
+BaseLine|ml2u.var
+
+# Section 2 : Hypotheses
+# -----------------------
+# 2.1. Editable period for exogeneous variables
+HypoPeriod|2013Y1|2020Y1
+
+# 2.2. Nb of decimals at startup
+HypoNbDec|3
+
+# 2.3 List of editable exogeneous variables + min, max, hint
+# HypoVar|Varname|min|max|Hint (min, max, hint not required)
+
+HypoVar|VIG_X     |Change in public investments (mln) |-2000|6000|Change in public investments (mln)
+HypoVar|ITPC0R_X  |VAT rate on consumption (%)|15|27|VAT rate on consumption (%)
+HypoVar|DTH_X     |Change in personal income tax receipts(mln)|-10000|10000|Change in personal income tax receipts(mln)
+HypoVar|CSSFR_X   |Employers' social contribution rate(%wages)|25|40|Employers' social contribution rate(%wages)
+HypoVar|CSSHR_X	  |Employees' social contribution rate(%wages)|10|20|Employees' social contribution rate(%wages)
+HypoVar|TGH_X     |Transfers to households (grt; constant prices)|-5|5|Transfers to households (grt; constant prices)
+# HypoVar|DTFR_X    |Change in corporate tax rate (in %) |-0.5|0.5| Change in corporate tax rate (in %)
+HypoVar|WR_X      |Correction of the grt of private wages (%)|-2|2|Correction of the grt of private wages (%)
+HypoVar|WGRR_X    |Public real wage rate: grt(%)|-2|5|Public real wage rate:grt(%)
+HypoVar|NG_X      |Change of employment in the public sector (thousands)|-40|40|Change of employment in the public sector (thousands)
+HypoVar|ZX_X      |Change in automatic indexation (%)|-2|0|Change in automatic indexation (%)
+# HypoVar|PM_X      |Import prices (grt in percent)|-5|5|Import prices (grt in percent)
+# HypoVar|ULCW_X    |Foreign Unit labour cost (grt in percent)|-5|5|Foreign Unit labour cost (grt in percent)
+# HypoVar|GDPW_X    |Foreign GDP (grt in percent)|-5|5|Foreign GDP (grt in percent)
+# HypoVar|RLDE_     |Nominal long term interest rate in Germany (in percent)|0|3|Real long term interest rate (in percent)
+# HypoVar|NAT_X     |Active population (change in thousands)|-40 |50|Active population (change in thousands)
+# HypoVar|GDP_T|||GDP Target
+# HypoVar|GDP_W|||GDP preference weight
+# HypoVar|PC_T|||Price Target
+# HypoVar|PC_W|||Price preference weight
+# HypoVar|UR_T|||Unemployment rate Target
+# HypoVar|UR_W|||Unemployment rate preference weight
+# HypoVar|DR_T|||Public Deficit ratio Target
+# HypoVar|DR_W|||Public deficit ratio preference weight
+
+# Section 3 : Simulation
+# ----------------------
+# 3.1 Simulation Period and parms
+SimPeriod|2013Y1|2020Y1
+
+
+SimMaxit|1000
+SimEps|0.0001
+SimInitValues|1
+SimConnex|B
+SimRelax|0.2
+SimWait|200
+
+# 3.2. Simulation graphics
+SimGraph|GDP growth|grt(GDP_)
+SimGraph|Inflation|grt(PC_)
+SimGraph|PSBR|DR_*100
+SimGraph|Unemployment Rate|UR_*100
+
+# Section 4 : actions (ex results) = (list of reports)
+# -------------------------------------
+Action|Policy|Policy instruments|restbl1.rep|Compare with?|F|ml2u.var
+Action|Impact of policy|Changes of key indicators wrt baseline|restbl2.rep|Compare with?|F|ml2u.var
+Action|Projection|Macroeconomic projection results|restbl3.rep
+Action|Export|Export results to a RTF file|print.rep|Compare with?|F|ml2u.var|Print to?|F|result.rtf

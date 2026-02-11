@@ -1,0 +1,127 @@
+<body>
+<style>
+body {font-family: "Arial"; font-size:13px;}
+p {padding:1px;}
+.btn {border: 1px solid black; color:black; background-color: lightgray; border-radius:8;padding: 2px; font-family: Monospace; font-size:11px;}
+h1 {color:#666699}
+h2 {color:#666699} 
+h3 {color:#666699;border-bottom-style: solid; border-width:1px;}
+</style>
+<h1>The Planning Corner Project: simulation de l'économie belge</h1>
+
+<p>Le Planning corner project vise à développer des applications 
+conviviales concernant l'utilisation de modèles économétriques.</p> 
+<p>Cette première application a consisté à concevoir un simulateur de 
+l'économie belge à partir d'un petit modèle expérimental.</p> 
+
+<h2>Le simulateur</h2>
+<p>Le simulateur de l'économie belge permet de tester des mesures de 
+politique économique, principalement de tester des mesures en finances 
+publiques.</p> 
+
+<p>Le simulateur comprend 3 étapes:</p>
+
+<ul>
+<li>La première étape consiste à spécifier les hypothèses concernant les instruments de politique économique 
+mis à la disposition des utilisateurs.
+<li>La deuxième étape réalise la simulation elle-même 
+<li>La troisième étape consiste à visualiser, imprimer et exporter les résultats
+</ul>
+
+<h3>STEP 1. Hypothèses</h3>
+<p>La première opération à effectuer lorsqu’on on veut faire une 
+simulation est de <b>spécifier la base de données de départ des 
+variables du modèle</b>. Il s’agit le plus souvent des résultats d’une simulation 
+antérieure. Par défaut, il s'agit de la simulation dite « simulation de base ». 
+Pour charger un autre fichier de données, il suffit de le sélectionner à l'aide du bouton 
+<span class="btn"><b> Load&nbsp;Variables</b></span>.</p>
+
+<p>Lorsqu’il a pris connaissance des résultats de la simulation de base, 
+l’utilisateur peut se lancer dans la simulation de changements de 
+politiques. Pour cela, il modifie les chiffres du tableau des 
+instruments de politique. Il faut évidemment faire attention à la 
+manière dont les instruments sont spécifiés : certains sont des taux de 
+prélèvement, d’autres des taux de croissance, d’autres encore des 
+milliards d’euros. Ces modifications ne peuvent pas excéder certaines 
+bornes spécifiées par le concepteur du modèle. </p> 
+
+<p>Lorsque les hypothèses ont été modifiées on peut les <b>comparer avec un autre fichier de 
+données</b> en passant directement au <b>STEP 3</b> : en cliquant sur l'onglet « Policy », on visualise
+simultanément les hypothèses nouvellement introduites avec celles de la  « simulation de base ».
+</p> 
+
+<p>On peut revenir à tout moment au <b>STEP 1</b> pour modifier les hypothèses pour repartir au <b>STEP 3</b>
+pour une comparaison.</p>
+
+<p>Quand le tableau est 
+prêt, l’utilisateur peut passer à l’étape suivante et simuler le 
+modèle. </p>
+
+<h3>STEP 2. Simulation</h3>
+
+<p>La simulation est lancée en cliquant simplement sur le bouton <span class="btn">Start&nbsp;Simulation</span>.</p>
+
+<p>Quatre graphiques montrent la progression année après année des 
+principaux indicateurs macroéconomiques : croissance du PIB, inflation, 
+déficit public en pourcent du PIB et taux de chômage. Chaque graphique 
+montre l’indicateur de la projection de base et de la projection qui est 
+en train de s’exécuter. En principe, la simulation s’effectue sur la 
+période qui va jusque 2020.</p> 
+
+<p>A l'issue de la simulation, l'utilisateur a le loisir de sauver les résultats obtenus 
+dans un fichier de variables via le bouton <span class="btn">Save&nbsp;Variables&nbsp;File</span></b>. 
+Ce fichier pourra ultérieurement être utilisé comme "simulation de base" pour un nouvel exercice. </p>
+
+<p>L’utilisateur peut ensuite passer à un examen plus approfondi des résultats en passant au <b>STEP 3</b>. </p> 
+
+<h3>STEP 3. Résultats</h3>
+
+Les résultats de la simulation sont structurés sous forme d'onglets : 
+<ul>
+<li>le premier rappelle les <b>instruments de politique</b> qui ont été modifiés ;
+
+<li>le deuxième donne les <b>impacts sur les variables 
+macroéconomiques</b> de la simulation en comparant les indicateurs de la 
+simulation avec ceux de la projection de base. Pour la plupart des 
+indicateurs, il s’agira des écarts en pourcent de la valeur de 
+l’indicateur dans la simulation par rapport à celle de la simulation de 
+base, pour d’autres il s’agira de différences simples ; 
+
+<li>le troisième donne les <b>résultats de la simulation</b>.
+<li> un quatrième onglet permet de <b>sauver les résultats dans un fichier</b> (format RTF).</li>
+</ul>
+
+<p>Lorsqu’on clique sur le deuxième ou le troisième signet, une série de nouveaux signets apparaissent qui représentent des tableaux donnant les résultats de comparaison ou de simulation. 
+Lorsqu’on clique sur un signet, le tableau apparait.</p>
+
+<p>Les tableaux ont en fait la même structure en analyse d’impacts et en 
+analyse des résultats en niveau de la simulation. Il s’agit de :</p> 
+
+<ul>
+<li><b>MACRO_IMPACTS</b> et <b>MACRO_RESULTS</b> qui donnent les principaux résultats macroéconomiques : 
+le PIB et sa décomposition, l’emploi, les prix et les coûts, la productivité et l’output potentiel ;
+
+<li><b>RATIOS</b> qui donne les principaux résultats concernant des indicateurs clés, 
+comme le déficit public en pourcent du PIB, le taux d’épargne, le taux de profit ou le taux de chômage ;
+
+<li><b>GACCOUNT</b> et <b>GACCOUNTR</b> qui présentent le compte agrégé de finances publiques, 
+l’un en milliards et l’autre en pourcent du PIB. 
+Les comptes des autres agents sont aussi disponibles: H pour Households, F pour Firms et W pour Rest of the world.
+</ul>
+
+<p>L’analyse de la simulation peut se poursuivre sur d’autres supports : 
+les résultats peuvent en effet être transcrits dans un document word (rtf) ou dans des feuilles excel, 
+ce qui permet alors à l’utilisateur de faire d’autres types de présentations, graphiques par exemple, 
+ou de calculer des indicateurs ou de combiner la présentation de plusieurs simulations.</p>
+
+<p>Lorsque le travail sur cette simulation est terminé, l’utilisateur peut recommencer une autre simulation, 
+soit en repartant de la simulation de base, soit en repartant de la simulation qu’il vient de terminer, 
+soit d’une autre simulation encore.</p>
+
+<h2>Organisation des données et des résultats</h2>
+<p>Les données du modèles et les résultats des exercices de simulation se trouvent dans le sous-répertoire "data". 
+Ce sous-répertoire peut être structuré par l'utilisateur de telle sorte que les résultats de 
+chaque exercice (fichier de données, tableaux Excel, fichier Word, ...) 
+soient regroupés dans un sous-répertoire.</p>
+
+</body>
